@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QR Code Generator and Reader</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script src="https://unpkg.com/jsqr"></script>  
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="content">
+        <input id="text" type="text" placeholder="Enter text" />
+        <button id="generate">Generate QR Code</button>
+        <div id="qrcode"></div>
+        <button id="download">Download QR Code</button>
+        <button id="reset1">Reset Generator</button>
+        <button id="startScan">Start Scanner</button>
+    
+
+        <video id="preview"></video>
+        <button id="reset2">Reset Scanner</button>
+        <div  id="output"></div>
+        
+        <canvas id="canvas" hidden></canvas>
+    </div>
+    <script>
+    
+        // Generate QR Code
+document.getElementById('generate').onclick = function generate() {
+    var text = document.getElementById('text').value;
+
+    var qrcodeDiv = document.getElementById("qrcode");
+    // Clear the div
+    while (qrcodeDiv.firstChild) {
+        qrcodeDiv.removeChild(qrcodeDiv.firstChild);
+    }
+    // Generate new QR code
+    var qrcode = new QRCode(qrcodeDiv, {
+        text: text,
+        width: 600,
+        height: 600
+    });
+}
+
+        // Download QR Code
+        document.getElementById('download').onclick = function download() {
+            var canvas = document.getElementsByTagName('canvas')[0];
+            var img = canvas.toDataURL("image/png");
+            var link = document.createElement('a');
+            link.download = 'qrcode.png';
+            link.href = img;
+            link.click();
+        }
+
+        // Reset Generator
+        document.getElementById('reset1').onclick = function reset() {
+            document.getElementById('text').value = '';
+            var qrcode = document.getElementById('qrcode');
+            while (qrcode.firstChild) {
+                qrcode.removeChild(qrcode.firstChild);
+            }
+        }
+
+        // Read QR Code
+        var video = document.createElement("video");
+        var canvasElement = document.getElementById("canvas");
+        var canvas = canvasElement.getContext("2d");
+        
+        document.getElementById('startScan').onclick = function startScan() {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function(stream) {
+                video.srcObject = stream;
+                video.setAttribute("playsinline", true);
+                video.play();
+                requestAnimationFrame(tick);
+            });
+        }
+
+        function tick() {
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                canvasElement.hidden = false;
+
+                canvasElement.height = video.videoHeight;
+                canvasElement.width = video.videoWidth;
+                canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+
+                var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+                var code = jsQR(imageData.data, imageData.width, imageData.height);
+
+                if (code) {
+                    document.getElementById('output').innerText = "Found QR code: " + code.data;
+                }
+            }
+
+            requestAnimationFrame(tick);
+        }
+
+       
+
+        // Reset Scanner
+        document.getElementById('reset2').onclick = function reset() {
+            document.getElementById('output').innerText = '';
+        }
+    </script>
+</body>
+</html>
