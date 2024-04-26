@@ -50,7 +50,7 @@
     width:26.25em;
     border-radius:0.4375em;
     margin: 0 1em 0 1em;
-    background:var(--orange_color);
+    background: rgb(53, 207, 246);
     padding: 1em ;
     transition: height 0.2s ease;
     box-shadow: 0 0.625em 1.25em rgba(0,0,0,0.1);
@@ -192,7 +192,7 @@
     margin: 0 1em 0 1em;
     padding: 0em 3em 0em 3em;
     width: 28em;
-    border: 1em solid var(--orange_color);
+    border: 1em solid  rgb(53, 207, 246);
     border-radius: 0.6em;
     box-shadow: 0 1.5em 3em rgba(3, 21, 55, 0.3);
   }
